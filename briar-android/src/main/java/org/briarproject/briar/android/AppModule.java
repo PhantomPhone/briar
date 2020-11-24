@@ -32,6 +32,7 @@ import org.briarproject.briar.android.forum.ForumModule;
 import org.briarproject.briar.android.keyagreement.ContactExchangeModule;
 import org.briarproject.briar.android.login.LoginModule;
 import org.briarproject.briar.android.navdrawer.NavDrawerModule;
+import org.briarproject.briar.android.settings.SettingsModule;
 import org.briarproject.briar.android.privategroup.list.GroupListModule;
 import org.briarproject.briar.android.reporting.DevReportModule;
 import org.briarproject.briar.android.test.TestAvatarCreatorImpl;
@@ -69,6 +70,7 @@ import static org.briarproject.briar.android.TestingConstants.IS_DEBUG_BUILD;
 		LoginModule.class,
 		NavDrawerModule.class,
 		ViewModelModule.class,
+		SettingsModule.class,
 		DevReportModule.class,
 		// below need to be within same scope as ViewModelProvider.Factory
 		ForumModule.BindsModule.class,
@@ -253,6 +255,17 @@ public class AppModule {
 
 	@Provides
 	FeatureFlags provideFeatureFlags() {
-		return () -> IS_DEBUG_BUILD;
+		return new FeatureFlags() {
+
+			@Override
+			public boolean shouldEnableImageAttachments() {
+				return IS_DEBUG_BUILD;
+			}
+
+			@Override
+			public boolean shouldEnableProfilePictures() {
+				return IS_DEBUG_BUILD;
+			}
+		};
 	}
 }
