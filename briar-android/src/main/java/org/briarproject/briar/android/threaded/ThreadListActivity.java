@@ -27,7 +27,6 @@ import org.briarproject.briar.android.view.TextInputView;
 import org.briarproject.briar.android.view.TextSendController;
 import org.briarproject.briar.android.view.TextSendController.SendListener;
 import org.briarproject.briar.android.view.UnreadMessageButton;
-import org.briarproject.briar.api.client.NamedGroup;
 import org.briarproject.briar.api.messaging.AttachmentHeader;
 
 import java.util.Collection;
@@ -48,7 +47,7 @@ import static org.briarproject.bramble.util.StringUtils.isNullOrEmpty;
 
 @MethodsNotNullByDefault
 @ParametersNotNullByDefault
-public abstract class ThreadListActivity<G extends NamedGroup, I extends ThreadItem, A extends ThreadItemAdapter<I>>
+public abstract class ThreadListActivity<I extends ThreadItem, A extends ThreadItemAdapter<I>>
 		extends BriarActivity
 		implements ThreadListListener<I>, SendListener, SharingListener,
 		ThreadItemListener<I>, ThreadListDataSource {
@@ -70,9 +69,9 @@ public abstract class ThreadListActivity<G extends NamedGroup, I extends ThreadI
 	@Nullable
 	private MessageId replyId;
 
-	protected abstract ThreadListController<G, I> getController();
+	protected abstract ThreadListController<I> getController();
 
-	protected abstract ThreadListViewModel<G, I> getViewModel();
+	protected abstract ThreadListViewModel<I> getViewModel();
 
 	@Inject
 	protected SharingController sharingController;
@@ -127,6 +126,11 @@ public abstract class ThreadListActivity<G extends NamedGroup, I extends ThreadI
 			if (replyIdBytes != null) replyId = new MessageId(replyIdBytes);
 		}
 
+		getViewModel().getItems().observe(this, result -> result
+				.onError(this::handleException)
+				.onSuccess(this::displayItems)
+		);
+
 		sharingController.setSharingListener(this);
 		loadSharingContacts();
 	}
@@ -145,44 +149,22 @@ public abstract class ThreadListActivity<G extends NamedGroup, I extends ThreadI
 
 	protected abstract A createAdapter(LinearLayoutManager layoutManager);
 
-	protected void loadItems() {
-		int revision = adapter.getRevision();
-		getController().loadItems(
-				new UiResultExceptionHandler<ThreadItemList<I>, DbException>(
-						this) {
-					@Override
-					public void onResultUi(ThreadItemList<I> items) {
-						if (revision == adapter.getRevision()) {
-							adapter.incrementRevision();
-							if (items.isEmpty()) {
-								list.showData();
-							} else {
-								displayItems(items);
-								updateTextInput();
-							}
-						} else {
-							LOG.info("Concurrent update, reloading");
-							loadItems();
-						}
-					}
-
-					@Override
-					public void onExceptionUi(DbException exception) {
-						handleException(exception);
-					}
-				});
-	}
-
-	private void displayItems(ThreadItemList<I> items) {
-		adapter.setItems(items);
-		MessageId messageId = items.getFirstVisibleItemId();
-		if (messageId != null)
-			adapter.setItemWithIdVisible(messageId);
-		list.showData();
-		if (layoutManagerState == null) {
-			list.scrollToPosition(0);  // Scroll to the top
+	protected void displayItems(List<I> items) {
+		if (items.isEmpty()) {
+			list.showData();
 		} else {
-			layoutManager.onRestoreInstanceState(layoutManagerState);
+			adapter.submitList(items);
+			// TODO get this ID from elsewhere
+			MessageId messageId = null; // items.getFirstVisibleItemId();
+			if (messageId != null)
+				adapter.setItemWithIdVisible(messageId);
+			list.showData();
+			if (layoutManagerState == null) {
+				list.scrollToPosition(0);  // Scroll to the top
+			} else {
+				layoutManager.onRestoreInstanceState(layoutManagerState);
+			}
+			updateTextInput();
 		}
 	}
 
@@ -209,7 +191,6 @@ public abstract class ThreadListActivity<G extends NamedGroup, I extends ThreadI
 	public void onStart() {
 		super.onStart();
 		sharingController.onStart();
-		loadItems();
 		list.startPeriodicUpdate();
 	}
 
@@ -296,7 +277,7 @@ public abstract class ThreadListActivity<G extends NamedGroup, I extends ThreadI
 	}
 
 	private void scrollToItemAtTop(I item) {
-		int position = adapter.findItemPosition(item);
+		int position = NO_POSITION;// adapter.findItemPosition(item);
 		if (position != NO_POSITION) {
 			layoutManager
 					.scrollToPositionWithOffset(position, 0);
@@ -357,15 +338,14 @@ public abstract class ThreadListActivity<G extends NamedGroup, I extends ThreadI
 	}
 
 	private void addItem(I item, boolean isLocal) {
-		adapter.incrementRevision();
 		MessageId parent = item.getParentId();
-		if (parent != null && !adapter.contains(parent)) {
+		if (parent != null) {
 			// We've incremented the adapter's revision, so the item will be
 			// loaded when its parent has been loaded
 			LOG.info("Ignoring item with missing parent");
 			return;
 		}
-		adapter.add(item);
+		// TODO submit new list
 
 		if (isLocal) {
 			scrollToItemAtTop(item);
