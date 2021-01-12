@@ -72,7 +72,7 @@ public class SetPasswordFragment extends SetupFragment {
 		passwordConfirmation.addTextChangedListener(this);
 		nextButton.setOnClickListener(this);
 
-		if (!needToShowDozeFragment()) {
+		if (!viewModel.needToShowDozeFragment()) {
 			nextButton.setText(R.string.create_account_button);
 			passwordConfirmation.setImeOptions(IME_ACTION_DONE);
 		}
@@ -113,11 +113,6 @@ public class SetPasswordFragment extends SetupFragment {
 		passwordConfirmation.setOnEditorActionListener(enabled ? this : null);
 	}
 
-	boolean needToShowDozeFragment() {
-		return DozeView.needsToBeShown(getActivity()) ||
-				HuaweiView.needsToBeShown(getActivity());
-	}
-
 	@Override
 	public void onClick(View view) {
 		IBinder token = passwordEntry.getWindowToken();
@@ -125,7 +120,7 @@ public class SetPasswordFragment extends SetupFragment {
 		((InputMethodManager) o).hideSoftInputFromWindow(token, 0);
 		viewModel.password = passwordEntry.getText().toString();
 
-		if (needToShowDozeFragment()) {
+		if (viewModel.needToShowDozeFragment()) {
 			viewModel.state.setValue(DOZE);
 		} else {
 			nextButton.setVisibility(INVISIBLE);

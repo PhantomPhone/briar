@@ -1,14 +1,18 @@
 package org.briarproject.briar.android.account;
 
+import android.app.Application;
+
 import org.briarproject.bramble.api.crypto.PasswordStrengthEstimator;
 
 import javax.inject.Inject;
 
 import androidx.annotation.Nullable;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
-public class SetupViewModel extends ViewModel {
+import static org.briarproject.briar.android.util.UiUtils.needsDozeWhitelisting;
+
+public class SetupViewModel extends AndroidViewModel {
 	enum State {AUTHORNAME, SETPASSWORD, DOZE, CREATEACCOUNT}
 
 	@Nullable
@@ -19,11 +23,20 @@ public class SetupViewModel extends ViewModel {
 	@Inject
 	PasswordStrengthEstimator strengthEstimator;
 
+	private final Application app;
+
 	@Inject
-	SetupViewModel() {
+	SetupViewModel(Application app) {
+		super(app);
+		this.app = app;
 	}
 
     public float estimatePasswordStrength(String password) {
 	    return strengthEstimator.estimateStrength(password);
     }
+
+	boolean needToShowDozeFragment() {
+		return needsDozeWhitelisting(app.getApplicationContext()) ||
+				HuaweiView.needsToBeShown(app.getApplicationContext());
+	}
 }
