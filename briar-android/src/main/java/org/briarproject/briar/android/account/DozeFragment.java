@@ -20,6 +20,7 @@ import androidx.annotation.Nullable;
 
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
+import static org.briarproject.briar.android.account.SetupViewModel.State.CREATEACCOUNT;
 import static org.briarproject.briar.android.activity.RequestCodes.REQUEST_DOZE_WHITELISTING;
 import static org.briarproject.briar.android.util.UiUtils.showOnboardingDialog;
 
@@ -106,7 +107,7 @@ public class DozeFragment extends SetupFragment
 	public void onClick(View view) {
 		next.setVisibility(INVISIBLE);
 		progressBar.setVisibility(VISIBLE);
-		viewModel.state.setValue(SetupViewModel.State.CREATEACCOUNT);
+		viewModel.state.setValue(CREATEACCOUNT);
 	}
 
 }
