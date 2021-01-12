@@ -12,7 +12,6 @@ import android.widget.ProgressBar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
-import org.briarproject.bramble.api.crypto.PasswordStrengthEstimator;
 import org.briarproject.bramble.api.nullsafety.MethodsNotNullByDefault;
 import org.briarproject.bramble.api.nullsafety.ParametersNotNullByDefault;
 import org.briarproject.briar.R;
@@ -20,7 +19,6 @@ import org.briarproject.briar.android.activity.ActivityComponent;
 import org.briarproject.briar.android.login.StrengthMeter;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
 import static android.view.View.INVISIBLE;
@@ -34,10 +32,6 @@ import static org.briarproject.briar.android.util.UiUtils.setError;
 @MethodsNotNullByDefault
 @ParametersNotNullByDefault
 public class SetPasswordFragment extends SetupFragment {
-
-	@Inject
-	PasswordStrengthEstimator strengthEstimator;
-
 	private final static String TAG = SetPasswordFragment.class.getName();
 
 	private TextInputLayout passwordEntryWrapper;
@@ -104,7 +98,7 @@ public class SetPasswordFragment extends SetupFragment {
 
 		strengthMeter
 				.setVisibility(password1.length() > 0 ? VISIBLE : INVISIBLE);
-		float strength = strengthEstimator.estimateStrength(password1);
+		float strength = viewModel.estimatePasswordStrength(password1);
 		strengthMeter.setStrength(strength);
 		boolean strongEnough = strength >= QUITE_WEAK;
 
