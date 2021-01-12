@@ -72,7 +72,7 @@ import static org.briarproject.briar.android.TestingConstants.IS_DEBUG_BUILD;
 		ViewModelModule.class,
 		DevReportModule.class,
 		// below need to be within same scope as ViewModelProvider.Factory
-		BlogModule.BindsModule.class,
+		BlogModule.class,
 		ForumModule.class,
 		GroupListModule.class,
 		GroupConversationModule.class,
