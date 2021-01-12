@@ -12,6 +12,7 @@ import android.widget.ProgressBar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
+import org.briarproject.bramble.api.crypto.PasswordStrengthEstimator;
 import org.briarproject.bramble.api.nullsafety.MethodsNotNullByDefault;
 import org.briarproject.bramble.api.nullsafety.ParametersNotNullByDefault;
 import org.briarproject.briar.R;
@@ -19,6 +20,7 @@ import org.briarproject.briar.android.activity.ActivityComponent;
 import org.briarproject.briar.android.login.StrengthMeter;
 
 import javax.annotation.Nullable;
+import javax.inject.Inject;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
 import static android.view.View.INVISIBLE;
@@ -30,6 +32,9 @@ import static org.briarproject.briar.android.util.UiUtils.setError;
 @MethodsNotNullByDefault
 @ParametersNotNullByDefault
 public class SetPasswordFragment extends SetupFragment {
+
+	@Inject
+	PasswordStrengthEstimator strengthEstimator;
 
 	private final static String TAG = SetPasswordFragment.class.getName();
 
@@ -71,7 +76,7 @@ public class SetPasswordFragment extends SetupFragment {
 		passwordConfirmation.addTextChangedListener(this);
 		nextButton.setOnClickListener(this);
 
-		if (!setupController.needToShowDozeFragment()) {
+		if (!needToShowDozeFragment()) {
 			nextButton.setText(R.string.create_account_button);
 			passwordConfirmation.setImeOptions(IME_ACTION_DONE);
 		}
@@ -97,7 +102,7 @@ public class SetPasswordFragment extends SetupFragment {
 
 		strengthMeter
 				.setVisibility(password1.length() > 0 ? VISIBLE : INVISIBLE);
-		float strength = setupController.estimatePasswordStrength(password1);
+		float strength = strengthEstimator.estimateStrength(password1);
 		strengthMeter.setStrength(strength);
 		boolean strongEnough = strength >= QUITE_WEAK;
 
@@ -112,18 +117,24 @@ public class SetPasswordFragment extends SetupFragment {
 		passwordConfirmation.setOnEditorActionListener(enabled ? this : null);
 	}
 
+	boolean needToShowDozeFragment() {
+		return DozeView.needsToBeShown(getActivity()) ||
+				HuaweiView.needsToBeShown(getActivity());
+	}
+
 	@Override
 	public void onClick(View view) {
 		IBinder token = passwordEntry.getWindowToken();
 		Object o = getContext().getSystemService(INPUT_METHOD_SERVICE);
 		((InputMethodManager) o).hideSoftInputFromWindow(token, 0);
-		setupController.setPassword(passwordEntry.getText().toString());
-		if (setupController.needToShowDozeFragment()) {
-			setupController.showDozeFragment();
+		viewModel.password = passwordEntry.getText().toString();
+
+		if (needToShowDozeFragment()) {
+			viewModel.state.setValue(SetupViewModel.State.DOZE);
 		} else {
 			nextButton.setVisibility(INVISIBLE);
 			progressBar.setVisibility(VISIBLE);
-			setupController.createAccount();
+			viewModel.state.setValue(SetupViewModel.State.CREATEACCOUNT);
 		}
 	}
 

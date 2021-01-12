@@ -81,8 +81,8 @@ public class AuthorNameFragment extends SetupFragment {
 	public void onClick(View view) {
 		Editable text = authorNameInput.getText();
 		if (text != null) {
-			setupController.setAuthorName(text.toString().trim());
-			setupController.showPasswordFragment();
+			viewModel.authorName = text.toString().trim();
+			viewModel.state.setValue(SetupViewModel.State.SETPASSWORD);
 		}
 	}
 

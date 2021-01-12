@@ -106,7 +106,7 @@ public class DozeFragment extends SetupFragment
 	public void onClick(View view) {
 		next.setVisibility(INVISIBLE);
 		progressBar.setVisibility(VISIBLE);
-		setupController.createAccount();
+		viewModel.state.setValue(SetupViewModel.State.CREATEACCOUNT);
 	}
 
 }

@@ -5,38 +5,52 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import org.briarproject.bramble.api.account.AccountManager;
+import org.briarproject.bramble.api.lifecycle.IoExecutor;
 import org.briarproject.bramble.api.nullsafety.MethodsNotNullByDefault;
 import org.briarproject.bramble.api.nullsafety.ParametersNotNullByDefault;
 import org.briarproject.briar.R;
 import org.briarproject.briar.android.activity.ActivityComponent;
 import org.briarproject.briar.android.activity.BaseActivity;
+import org.briarproject.briar.android.controller.handler.ResultHandler;
+import org.briarproject.briar.android.controller.handler.UiResultHandler;
 import org.briarproject.briar.android.fragment.BaseFragment.BaseFragmentListener;
+
+import java.util.concurrent.Executor;
+import java.util.logging.Logger;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+
+import androidx.lifecycle.ViewModelProvider;
 
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 import static android.content.Intent.FLAG_ACTIVITY_TASK_ON_HOME;
 import static org.briarproject.briar.android.BriarApplication.ENTRY_ACTIVITY;
+import static org.briarproject.briar.android.account.SetupViewModel.State.AUTHORNAME;
+import static org.briarproject.briar.android.account.SetupViewModel.State.CREATEACCOUNT;
+import static org.briarproject.briar.android.account.SetupViewModel.State.DOZE;
+import static org.briarproject.briar.android.account.SetupViewModel.State.SETPASSWORD;
 
 @MethodsNotNullByDefault
 @ParametersNotNullByDefault
 public class SetupActivity extends BaseActivity
 		implements BaseFragmentListener {
 
-	private static final String STATE_KEY_AUTHOR_NAME = "authorName";
-	private static final String STATE_KEY_PASSWORD = "password";
+	private static final Logger LOG =
+			Logger.getLogger(SetupActivity.class.getName());
 
 	@Inject
 	AccountManager accountManager;
 
 	@Inject
-	SetupController setupController;
+	ViewModelProvider.Factory viewModelFactory;
+	private SetupViewModel viewModel;
 
-	@Nullable
-	private String authorName, password;
+	@Inject
+	@IoExecutor
+	Executor ioExecutor;
 
 	@Override
 	public void onCreate(@Nullable Bundle state) {
@@ -45,58 +59,84 @@ public class SetupActivity extends BaseActivity
 		overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
 		setContentView(R.layout.activity_fragment_container);
 
-		if (state == null) {
-			if (accountManager.accountExists()) throw new AssertionError();
-			showInitialFragment(AuthorNameFragment.newInstance());
-		} else {
-			authorName = state.getString(STATE_KEY_AUTHOR_NAME);
-			password = state.getString(STATE_KEY_PASSWORD);
-		}
+		viewModel = new ViewModelProvider(this, viewModelFactory)
+				.get(SetupViewModel.class);
+
+		viewModel.state.observe(this, this::onStateChanged);
+
+// TODO so i should not have to care about the incoming state Bundle here,
+// since we have the ViewModel to keep our state, right?
+//		if (state == null) {
+//			if (accountManager.accountExists()) throw new AssertionError();
+//			showInitialFragment(AuthorNameFragment.newInstance());
+//		} else {
+//			authorName = viewModel.authorName
+//			password = viewModel.password
+//		}
 	}
 
 	@Override
 	public void injectActivity(ActivityComponent component) {
 		component.inject(this);
-		setupController.setSetupActivity(this);
 	}
 
 	@Override
 	protected void onSaveInstanceState(Bundle state) {
 		super.onSaveInstanceState(state);
-		if (authorName != null)
-			state.putString(STATE_KEY_AUTHOR_NAME, authorName);
-		if (password != null)
-			state.putString(STATE_KEY_PASSWORD, password);
+// TODO do I need to care about this, ViewModel saves us?
+//		if (authorName != null)
+//			state.putString(STATE_KEY_AUTHOR_NAME, authorName);
+//		if (password != null)
+//			state.putString(STATE_KEY_PASSWORD, password);
 	}
 
-	@Nullable
-	String getAuthorName() {
-		return authorName;
-	}
-
-	void setAuthorName(String authorName) {
-		this.authorName = authorName;
-	}
-
-	@Nullable
-	String getPassword() {
-		return password;
-	}
-
-	void setPassword(String password) {
-		this.password = password;
+	private void onStateChanged(SetupViewModel.State state) {
+		if (state == AUTHORNAME) {
+			if (accountManager.accountExists()) throw new AssertionError();
+			showInitialFragment(AuthorNameFragment.newInstance());
+		} else if (state == SETPASSWORD) {
+			showPasswordFragment();
+		} else if (state == DOZE) {
+			showDozeFragment();
+		} else if (state == CREATEACCOUNT) {
+			createAccount();
+		}
 	}
 
 	void showPasswordFragment() {
-		if (authorName == null) throw new IllegalStateException();
+		if (viewModel.authorName == null) throw new IllegalStateException();
 		showNextFragment(SetPasswordFragment.newInstance());
 	}
 
 	@TargetApi(23)
 	void showDozeFragment() {
-		if (authorName == null) throw new IllegalStateException();
-		if (password == null) throw new IllegalStateException();
+		if (viewModel.authorName == null) throw new IllegalStateException();
+		if (viewModel.password == null) throw new IllegalStateException();
 		showNextFragment(DozeFragment.newInstance());
+	}
+
+	public void createAccount() {
+		UiResultHandler<Boolean> resultHandler =
+				new UiResultHandler<Boolean>(this) {
+					@Override
+					public void onResultUi(Boolean result) {
+						showApp();
+					}
+				};
+		createAccount(resultHandler);
+	}
+
+	// Package access for testing
+	void createAccount(ResultHandler<Boolean> resultHandler) {
+		String authorName = viewModel.authorName;
+		if (authorName == null) throw new IllegalStateException();
+		String password = viewModel.password;
+		if (password == null) throw new IllegalStateException();
+		ioExecutor.execute(() -> {
+			LOG.info("Creating account");
+			resultHandler.onResult(accountManager.createAccount(authorName,
+					password));
+		});
 	}
 
 	void showApp() {
