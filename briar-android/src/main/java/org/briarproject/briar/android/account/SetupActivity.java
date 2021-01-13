@@ -9,7 +9,6 @@ import org.briarproject.bramble.api.nullsafety.ParametersNotNullByDefault;
 import org.briarproject.briar.R;
 import org.briarproject.briar.android.activity.ActivityComponent;
 import org.briarproject.briar.android.activity.BaseActivity;
-import org.briarproject.briar.android.controller.handler.UiResultHandler;
 import org.briarproject.briar.android.fragment.BaseFragment.BaseFragmentListener;
 
 import javax.annotation.Nullable;
@@ -22,9 +21,11 @@ import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 import static android.content.Intent.FLAG_ACTIVITY_TASK_ON_HOME;
 import static org.briarproject.briar.android.BriarApplication.ENTRY_ACTIVITY;
+import static org.briarproject.briar.android.account.SetupViewModel.State.CREATED;
 import static org.briarproject.briar.android.account.SetupViewModel.State.AUTHORNAME;
 import static org.briarproject.briar.android.account.SetupViewModel.State.CREATEACCOUNT;
 import static org.briarproject.briar.android.account.SetupViewModel.State.DOZE;
+import static org.briarproject.briar.android.account.SetupViewModel.State.FAILED;
 import static org.briarproject.briar.android.account.SetupViewModel.State.SETPASSWORD;
 
 @MethodsNotNullByDefault
@@ -63,7 +64,10 @@ public class SetupActivity extends BaseActivity
 		} else if (state == DOZE) {
 			showDozeFragment();
 		} else if (state == CREATEACCOUNT) {
-			createAccount();
+			viewModel.createAccount();
+		} else if (state == CREATED || state == FAILED) {
+			// TODO: Show an error if failed
+			showApp();
 		}
 	}
 
@@ -77,17 +81,6 @@ public class SetupActivity extends BaseActivity
 		if (viewModel.authorName == null) throw new IllegalStateException();
 		if (viewModel.password == null) throw new IllegalStateException();
 		showNextFragment(DozeFragment.newInstance());
-	}
-
-	public void createAccount() {
-		UiResultHandler<Boolean> resultHandler =
-				new UiResultHandler<Boolean>(this) {
-					@Override
-					public void onResultUi(Boolean result) {
-						showApp();
-					}
-				};
-		viewModel.createAccount(resultHandler);
 	}
 
 	void showApp() {

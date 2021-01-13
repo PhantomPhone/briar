@@ -5,7 +5,6 @@ import android.app.Application;
 import org.briarproject.bramble.api.account.AccountManager;
 import org.briarproject.bramble.api.crypto.PasswordStrengthEstimator;
 import org.briarproject.bramble.api.lifecycle.IoExecutor;
-import org.briarproject.briar.android.controller.handler.ResultHandler;
 
 import java.util.concurrent.Executor;
 import java.util.logging.Logger;
@@ -19,7 +18,7 @@ import androidx.lifecycle.MutableLiveData;
 import static org.briarproject.briar.android.util.UiUtils.needsDozeWhitelisting;
 
 public class SetupViewModel extends AndroidViewModel {
-	enum State {AUTHORNAME, SETPASSWORD, DOZE, CREATEACCOUNT}
+	enum State {AUTHORNAME, SETPASSWORD, DOZE, CREATEACCOUNT, CREATED, FAILED}
 
 	private static final Logger LOG =
 			Logger.getLogger(SetupActivity.class.getName());
@@ -60,14 +59,18 @@ public class SetupViewModel extends AndroidViewModel {
 	}
 
 	// Package access for testing
-	void createAccount(ResultHandler<Boolean> resultHandler) {
+	void createAccount() {
 		if (state.getValue() != State.CREATEACCOUNT) throw new IllegalStateException();
 		if (authorName == null) throw new IllegalStateException();
 		if (password == null) throw new IllegalStateException();
 		ioExecutor.execute(() -> {
-			LOG.info("Creating account");
-			resultHandler.onResult(accountManager.createAccount(authorName,
-					password));
+			if (accountManager.createAccount(authorName, password)) {
+				LOG.info("Created account");
+				this.state.postValue(State.CREATED);
+			} else {
+				LOG.warning("Failed to create account");
+				this.state.postValue(State.FAILED);
+			}
 		});
 	}
 }
