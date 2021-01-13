@@ -47,31 +47,11 @@ public class SetupActivity extends BaseActivity
 				.get(SetupViewModel.class);
 
 		viewModel.state.observe(this, this::onStateChanged);
-
-// TODO so i should not have to care about the incoming state Bundle here,
-// since we have the ViewModel to keep our state, right?
-//		if (state == null) {
-//			if (accountManager.accountExists()) throw new AssertionError();
-//			showInitialFragment(AuthorNameFragment.newInstance());
-//		} else {
-//			authorName = viewModel.authorName
-//			password = viewModel.password
-//		}
 	}
 
 	@Override
 	public void injectActivity(ActivityComponent component) {
 		component.inject(this);
-	}
-
-	@Override
-	protected void onSaveInstanceState(Bundle state) {
-		super.onSaveInstanceState(state);
-// TODO do I need to care about this, ViewModel saves us?
-//		if (authorName != null)
-//			state.putString(STATE_KEY_AUTHOR_NAME, authorName);
-//		if (password != null)
-//			state.putString(STATE_KEY_PASSWORD, password);
 	}
 
 	private void onStateChanged(SetupViewModel.State state) {
