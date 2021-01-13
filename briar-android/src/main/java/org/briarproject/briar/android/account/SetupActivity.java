@@ -4,19 +4,13 @@ import android.annotation.TargetApi;
 import android.content.Intent;
 import android.os.Bundle;
 
-import org.briarproject.bramble.api.account.AccountManager;
-import org.briarproject.bramble.api.lifecycle.IoExecutor;
 import org.briarproject.bramble.api.nullsafety.MethodsNotNullByDefault;
 import org.briarproject.bramble.api.nullsafety.ParametersNotNullByDefault;
 import org.briarproject.briar.R;
 import org.briarproject.briar.android.activity.ActivityComponent;
 import org.briarproject.briar.android.activity.BaseActivity;
-import org.briarproject.briar.android.controller.handler.ResultHandler;
 import org.briarproject.briar.android.controller.handler.UiResultHandler;
 import org.briarproject.briar.android.fragment.BaseFragment.BaseFragmentListener;
-
-import java.util.concurrent.Executor;
-import java.util.logging.Logger;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -38,19 +32,9 @@ import static org.briarproject.briar.android.account.SetupViewModel.State.SETPAS
 public class SetupActivity extends BaseActivity
 		implements BaseFragmentListener {
 
-	private static final Logger LOG =
-			Logger.getLogger(SetupActivity.class.getName());
-
-	@Inject
-	AccountManager accountManager;
-
 	@Inject
 	ViewModelProvider.Factory viewModelFactory;
-	private SetupViewModel viewModel;
-
-	@Inject
-	@IoExecutor
-	Executor ioExecutor;
+	SetupViewModel viewModel;
 
 	@Override
 	public void onCreate(@Nullable Bundle state) {
@@ -92,7 +76,7 @@ public class SetupActivity extends BaseActivity
 
 	private void onStateChanged(SetupViewModel.State state) {
 		if (state == AUTHORNAME) {
-			if (accountManager.accountExists()) throw new AssertionError();
+			if (viewModel.accountExists()) throw new AssertionError();
 			showInitialFragment(AuthorNameFragment.newInstance());
 		} else if (state == SETPASSWORD) {
 			showPasswordFragment();
@@ -123,20 +107,7 @@ public class SetupActivity extends BaseActivity
 						showApp();
 					}
 				};
-		createAccount(resultHandler);
-	}
-
-	// Package access for testing
-	void createAccount(ResultHandler<Boolean> resultHandler) {
-		String authorName = viewModel.authorName;
-		if (authorName == null) throw new IllegalStateException();
-		String password = viewModel.password;
-		if (password == null) throw new IllegalStateException();
-		ioExecutor.execute(() -> {
-			LOG.info("Creating account");
-			resultHandler.onResult(accountManager.createAccount(authorName,
-					password));
-		});
+		viewModel.createAccount(resultHandler);
 	}
 
 	void showApp() {
