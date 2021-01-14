@@ -290,8 +290,9 @@ public class ConversationActivity extends BriarActivity
 		textInputView.setReady(false);
 		textInputView.setOnKeyboardShownListener(this::scrollToBottom);
 
-		viewModel.getAutoDeleteTimer().observe(this, timer ->
-				sendController.setAutoDeleteTimer(timer));
+		viewModel.getAutoDeleteTimer().observe(this, timer -> {
+				sendController.setAutoDeleteTimer(timer);
+		});
 	}
 
 	private void scrollToBottom() {
@@ -1043,6 +1044,13 @@ public class ConversationActivity extends BriarActivity
 		ActivityOptionsCompat options =
 				makeSceneTransitionAnimation(this, view, transitionName);
 		ActivityCompat.startActivity(this, i, options.toBundle());
+	}
+
+	@Override
+	public void onAutoDeleteTimerNoticeClicked() {
+		Intent intent = new Intent(this, ConversationSettingsActivity.class);
+		intent.putExtra(CONTACT_ID, contactId.getInt());
+		startActivity(intent);
 	}
 
 	@DatabaseExecutor
