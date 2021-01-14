@@ -155,6 +155,16 @@
 		</activity>
 
 		<activity
+			android:name=".android.conversation.ConversationSettingsActivity"
+			android:parentActivityName="org.briarproject.briar.android.conversation.ConversationActivity"
+			android:label="@string/disappearing_messages_title"
+			android:theme="@style/BriarTheme">
+			<meta-data
+				android:name="android.support.PARENT_ACTIVITY"
+				android:value="org.briarproject.briar.android.conversation.ConversationActivity" />
+		</activity>
+
+		<activity
 			android:name="org.briarproject.briar.android.privategroup.creation.CreateGroupActivity"
 			android:label="@string/groups_create_group_title"
 			android:parentActivityName="org.briarproject.briar.android.navdrawer.NavDrawerActivity"
