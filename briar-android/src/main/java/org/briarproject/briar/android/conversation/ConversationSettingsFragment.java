@@ -27,7 +27,6 @@ import javax.inject.Inject;
 
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
 
 import static java.util.logging.Level.WARNING;
 import static org.briarproject.bramble.util.LogUtils.logException;
@@ -96,7 +95,7 @@ public class ConversationSettingsFragment extends BaseFragment {
 				contentView.findViewById(R.id.buttonLearnMore);
 		buttonLearnMore.setOnClickListener(e -> showLearnMoreDialog());
 
-		viewModel = ViewModelProviders.of(requireActivity(), viewModelFactory)
+		viewModel = new ViewModelProvider(this, viewModelFactory)
 				.get(ConversationViewModel.class);
 
 		return contentView;
