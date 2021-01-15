@@ -1,6 +1,5 @@
 package org.briarproject.briar.android.viewmodel;
 
-import org.briarproject.briar.android.account.SetupViewModel;
 import org.briarproject.briar.android.contact.add.remote.AddContactViewModel;
 import org.briarproject.briar.android.contact.add.remote.PendingContactListViewModel;
 import org.briarproject.briar.android.conversation.ConversationViewModel;

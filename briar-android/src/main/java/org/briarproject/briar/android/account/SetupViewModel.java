@@ -17,7 +17,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import static org.briarproject.briar.android.util.UiUtils.needsDozeWhitelisting;
 
-public class SetupViewModel extends AndroidViewModel {
+class SetupViewModel extends AndroidViewModel {
 	enum State {AUTHORNAME, SETPASSWORD, DOZE, CREATEACCOUNT, CREATED, FAILED}
 
 	private static final Logger LOG =
