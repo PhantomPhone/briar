@@ -64,7 +64,6 @@ public class ConversationSettingsFragment extends BaseFragment {
 
 		switchDisappearingMessages =
 				contentView.findViewById(R.id.switchDisappearingMessages);
-		switchDisappearingMessages.setEnabled(false);
 		switchDisappearingMessages
 				.setOnCheckedChangeListener((button, value) -> viewModel
 						.setAutoDeleteTimerEnabled(value));
