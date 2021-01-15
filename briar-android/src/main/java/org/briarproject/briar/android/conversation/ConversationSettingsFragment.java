@@ -1,6 +1,5 @@
 package org.briarproject.briar.android.conversation;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -13,6 +12,7 @@ import android.widget.TextView;
 import org.briarproject.bramble.api.nullsafety.MethodsNotNullByDefault;
 import org.briarproject.bramble.api.nullsafety.ParametersNotNullByDefault;
 import org.briarproject.briar.R;
+import org.briarproject.briar.android.activity.ActivityComponent;
 import org.briarproject.briar.android.fragment.BaseFragment;
 
 import java.util.logging.Logger;
@@ -37,7 +37,6 @@ public class ConversationSettingsFragment extends BaseFragment {
 	@Inject
 	ViewModelProvider.Factory viewModelFactory;
 
-	private ConversationSettingsActivity listener;
 	private ConversationViewModel viewModel;
 	private SwitchCompat switchDisappearingMessages;
 
@@ -47,10 +46,8 @@ public class ConversationSettingsFragment extends BaseFragment {
 	}
 
 	@Override
-	public void onAttach(Context context) {
-		super.onAttach(context);
-		listener = (ConversationSettingsActivity) context;
-		listener.getActivityComponent().inject(this);
+	public void injectFragment(ActivityComponent component) {
+		component.inject(this);
 	}
 
 	@Override
