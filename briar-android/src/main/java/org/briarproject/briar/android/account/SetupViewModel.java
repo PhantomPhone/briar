@@ -35,7 +35,6 @@ class SetupViewModel extends AndroidViewModel {
 
 	final MutableLiveData<State> state = new MutableLiveData<>(AUTHORNAME);
 
-	private final Application app;
 	private final AccountManager accountManager;
 	private final Executor ioExecutor;
 	private final PasswordStrengthEstimator strengthEstimator;
@@ -46,7 +45,6 @@ class SetupViewModel extends AndroidViewModel {
 			@IoExecutor Executor ioExecutor,
 			PasswordStrengthEstimator strengthEstimator) {
 		super(app);
-		this.app = app;
 		this.accountManager = accountManager;
 		this.ioExecutor = ioExecutor;
 		this.strengthEstimator = strengthEstimator;
@@ -83,8 +81,8 @@ class SetupViewModel extends AndroidViewModel {
     }
 
 	boolean needToShowDozeFragment() {
-		return needsDozeWhitelisting(app.getApplicationContext()) ||
-				HuaweiView.needsToBeShown(app.getApplicationContext());
+		return needsDozeWhitelisting(getApplication().getApplicationContext()) ||
+				HuaweiView.needsToBeShown(getApplication().getApplicationContext());
 	}
 
 	// Package access for testing
