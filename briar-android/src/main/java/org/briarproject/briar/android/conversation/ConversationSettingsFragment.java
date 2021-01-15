@@ -40,8 +40,7 @@ public class ConversationSettingsFragment extends BaseFragment {
 	public static final String TAG =
 			ConversationSettingsFragment.class.getName();
 
-	private static final Logger LOG =
-			Logger.getLogger(ConversationSettingsFragment.class.getName());
+	private static final Logger LOG = Logger.getLogger(TAG);
 
 	@Inject
 	ViewModelProvider.Factory viewModelFactory;
@@ -117,8 +116,7 @@ public class ConversationSettingsFragment extends BaseFragment {
 								.getAutoDeleteTimer(txn, c.getId());
 						disappearingMessages = timer != NO_AUTO_DELETE_TIMER;
 					});
-					listener.runOnUiThreadUnlessDestroyed(
-							this::displaySettings);
+					listener.runOnUiThread(this::displaySettings);
 				} catch (DbException e) {
 					logException(LOG, WARNING, e);
 				}
