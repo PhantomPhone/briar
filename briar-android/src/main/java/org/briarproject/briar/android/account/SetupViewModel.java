@@ -15,13 +15,14 @@ import androidx.annotation.Nullable;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
+import static java.util.logging.Logger.getLogger;
 import static org.briarproject.briar.android.util.UiUtils.needsDozeWhitelisting;
 
 class SetupViewModel extends AndroidViewModel {
 	enum State {AUTHORNAME, SETPASSWORD, DOZE, CREATEACCOUNT, CREATED, FAILED}
 
 	private static final Logger LOG =
-			Logger.getLogger(SetupActivity.class.getName());
+			getLogger(SetupActivity.class.getName());
 
 	@Nullable
 	private String authorName, password;
