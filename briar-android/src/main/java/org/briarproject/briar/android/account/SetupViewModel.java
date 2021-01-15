@@ -58,6 +58,7 @@ class SetupViewModel extends AndroidViewModel {
 	}
 
 	void setAuthorName(String authorName) {
+		if (authorName == null) throw new IllegalStateException();
 		this.authorName = authorName;
 		state.setValue(SETPASSWORD);
 	}
@@ -68,6 +69,8 @@ class SetupViewModel extends AndroidViewModel {
 	}
 
 	void setPassword(String password) {
+		if (getAuthorName() == null) throw new IllegalStateException();
+		if (password == null) throw new IllegalStateException();
 		this.password = password;
 		if (needToShowDozeFragment()) {
 			state.setValue(DOZE);

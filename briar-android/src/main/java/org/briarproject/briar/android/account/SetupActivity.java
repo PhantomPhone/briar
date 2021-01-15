@@ -71,14 +71,11 @@ public class SetupActivity extends BaseActivity
 	}
 
 	void showPasswordFragment() {
-		if (viewModel.getAuthorName() == null) throw new IllegalStateException();
 		showNextFragment(SetPasswordFragment.newInstance());
 	}
 
 	@TargetApi(23)
 	void showDozeFragment() {
-		if (viewModel.getAuthorName() == null) throw new IllegalStateException();
-		if (viewModel.getPassword() == null) throw new IllegalStateException();
 		showNextFragment(DozeFragment.newInstance());
 	}
 
