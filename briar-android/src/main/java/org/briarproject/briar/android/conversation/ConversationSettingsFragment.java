@@ -78,11 +78,12 @@ public class ConversationSettingsFragment extends BaseFragment {
 				contentView.findViewById(R.id.buttonLearnMore);
 		buttonLearnMore.setOnClickListener(e -> showLearnMoreDialog());
 
-		viewModel = new ViewModelProvider(this, viewModelFactory)
+		viewModel = new ViewModelProvider(requireActivity(), viewModelFactory)
 				.get(ConversationViewModel.class);
 
 		viewModel.getAutoDeleteTimer()
 				.observe(getViewLifecycleOwner(), timer -> {
+					LOG.info("Received auto delete timer: " + timer);
 					boolean disappearingMessages =
 							timer != NO_AUTO_DELETE_TIMER;
 					switchDisappearingMessages.setChecked(disappearingMessages);
