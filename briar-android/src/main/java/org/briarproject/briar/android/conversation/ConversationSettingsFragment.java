@@ -10,16 +10,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import org.briarproject.bramble.api.db.DatabaseExecutor;
-import org.briarproject.bramble.api.db.DbException;
-import org.briarproject.bramble.api.db.TransactionManager;
 import org.briarproject.bramble.api.nullsafety.MethodsNotNullByDefault;
 import org.briarproject.bramble.api.nullsafety.ParametersNotNullByDefault;
 import org.briarproject.briar.R;
 import org.briarproject.briar.android.fragment.BaseFragment;
-import org.briarproject.briar.api.autodelete.AutoDeleteManager;
 
-import java.util.concurrent.Executor;
 import java.util.logging.Logger;
 
 import javax.annotation.Nullable;
@@ -28,9 +23,6 @@ import javax.inject.Inject;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.lifecycle.ViewModelProvider;
 
-import static java.util.logging.Level.WARNING;
-import static org.briarproject.bramble.util.LogUtils.logException;
-import static org.briarproject.briar.android.util.UiUtils.observeOnce;
 import static org.briarproject.briar.api.autodelete.AutoDeleteConstants.NO_AUTO_DELETE_TIMER;
 
 @MethodsNotNullByDefault
@@ -44,18 +36,10 @@ public class ConversationSettingsFragment extends BaseFragment {
 
 	@Inject
 	ViewModelProvider.Factory viewModelFactory;
-	@Inject
-	@DatabaseExecutor
-	Executor dbExecutor;
-	@Inject
-	TransactionManager db;
-	@Inject
-	AutoDeleteManager autoDeleteManager;
 
 	private ConversationSettingsActivity listener;
 	private ConversationViewModel viewModel;
 	private SwitchCompat switchDisappearingMessages;
-	private volatile boolean disappearingMessages = false;
 
 	@Override
 	public String getUniqueTag() {
@@ -85,7 +69,7 @@ public class ConversationSettingsFragment extends BaseFragment {
 
 		switchDisappearingMessages =
 				contentView.findViewById(R.id.switchDisappearingMessages);
-
+		switchDisappearingMessages.setEnabled(false);
 		switchDisappearingMessages
 				.setOnCheckedChangeListener((button, value) -> viewModel
 						.setAutoDeleteTimerEnabled(value));
@@ -97,36 +81,15 @@ public class ConversationSettingsFragment extends BaseFragment {
 		viewModel = new ViewModelProvider(this, viewModelFactory)
 				.get(ConversationViewModel.class);
 
+		viewModel.getAutoDeleteTimer()
+				.observe(getViewLifecycleOwner(), timer -> {
+					boolean disappearingMessages =
+							timer != NO_AUTO_DELETE_TIMER;
+					switchDisappearingMessages.setChecked(disappearingMessages);
+					switchDisappearingMessages.setEnabled(true);
+				});
+
 		return contentView;
-	}
-
-	@Override
-	public void onStart() {
-		super.onStart();
-		switchDisappearingMessages.setEnabled(false);
-		loadSettings();
-	}
-
-	private void loadSettings() {
-		observeOnce(viewModel.getContact(), this, c -> {
-			dbExecutor.execute(() -> {
-				try {
-					db.transaction(false, txn -> {
-						long timer = autoDeleteManager
-								.getAutoDeleteTimer(txn, c.getId());
-						disappearingMessages = timer != NO_AUTO_DELETE_TIMER;
-					});
-					listener.runOnUiThread(this::displaySettings);
-				} catch (DbException e) {
-					logException(LOG, WARNING, e);
-				}
-			});
-		});
-	}
-
-	private void displaySettings() {
-		switchDisappearingMessages.setChecked(disappearingMessages);
-		switchDisappearingMessages.setEnabled(true);
 	}
 
 	@Override
@@ -134,7 +97,6 @@ public class ConversationSettingsFragment extends BaseFragment {
 		inflater.inflate(R.menu.help_action, menu);
 		super.onCreateOptionsMenu(menu, inflater);
 	}
-
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
