@@ -27,16 +27,19 @@ public class SetupViewModelTest extends BrambleMockTestCase {
 	public final InstantTaskExecutorRule testRule =
 			new InstantTaskExecutorRule();
 
-	private final AccountManager accountManager =
-			context.mock(AccountManager.class);
-
 	private final String authorName = getRandomString(MAX_AUTHOR_NAME_LENGTH);
 	private final String password = getRandomString(10);
 
+	private final AccountManager accountManager =
+			context.mock(AccountManager.class);
 	private final SetupViewModel viewModel;
 
 	public SetupViewModelTest() {
 		context.setImposteriser(ClassImposteriser.INSTANCE);
+		context.checking(new Expectations() {{
+			oneOf(accountManager).accountExists();
+			will(returnValue(false));
+		}});
 		viewModel = new SetupViewModel(context.mock(Application.class),
 				accountManager,
 				new ImmediateExecutor(),
