@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 import javax.inject.Inject;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
@@ -88,7 +89,7 @@ class SetupViewModel extends AndroidViewModel {
 				HuaweiView.needsToBeShown(getApplication().getApplicationContext());
 	}
 
-	// Package access for testing
+	@VisibleForTesting
 	void createAccount() {
 		if (state.getValue() != CREATEACCOUNT) throw new IllegalStateException();
 		if (getAuthorName() == null) throw new IllegalStateException();
