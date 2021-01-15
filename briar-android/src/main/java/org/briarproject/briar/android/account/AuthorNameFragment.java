@@ -19,7 +19,6 @@ import javax.annotation.Nullable;
 
 import static org.briarproject.bramble.api.identity.AuthorConstants.MAX_AUTHOR_NAME_LENGTH;
 import static org.briarproject.bramble.util.StringUtils.toUtf8;
-import static org.briarproject.briar.android.account.SetupViewModel.State.SETPASSWORD;
 import static org.briarproject.briar.android.util.UiUtils.setError;
 
 @MethodsNotNullByDefault
@@ -82,8 +81,7 @@ public class AuthorNameFragment extends SetupFragment {
 	public void onClick(View view) {
 		Editable text = authorNameInput.getText();
 		if (text != null) {
-			viewModel.authorName = text.toString().trim();
-			viewModel.state.setValue(SETPASSWORD);
+			viewModel.setAuthorName(text.toString().trim());
 		}
 	}
 

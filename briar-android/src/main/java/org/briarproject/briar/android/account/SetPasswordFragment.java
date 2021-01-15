@@ -25,8 +25,6 @@ import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 import static android.view.inputmethod.EditorInfo.IME_ACTION_DONE;
 import static org.briarproject.bramble.api.crypto.PasswordStrengthEstimator.QUITE_WEAK;
-import static org.briarproject.briar.android.account.SetupViewModel.State.CREATEACCOUNT;
-import static org.briarproject.briar.android.account.SetupViewModel.State.DOZE;
 import static org.briarproject.briar.android.util.UiUtils.setError;
 
 @MethodsNotNullByDefault

@@ -52,7 +52,7 @@ public class SetupViewModelTest extends BrambleMockTestCase {
 			will(returnValue(true));
 		}});
 
-		viewModel.authorName = authorName;
+		viewModel.setAuthorName(authorName);
 		viewModel.setPassword(password);
 		viewModel.state.setValue(CREATEACCOUNT);
 
