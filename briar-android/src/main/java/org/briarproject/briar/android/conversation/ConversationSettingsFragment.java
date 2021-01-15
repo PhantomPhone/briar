@@ -37,20 +37,19 @@ public class ConversationSettingsFragment extends BaseFragment {
 	@Inject
 	ViewModelProvider.Factory viewModelFactory;
 
+	private ConversationViewModel viewModel;
+
 	@Override
 	public void injectFragment(ActivityComponent component) {
 		component.inject(this);
+		viewModel = new ViewModelProvider(requireActivity(), viewModelFactory)
+				.get(ConversationViewModel.class);
 	}
-
-	private ConversationViewModel viewModel;
 
 	@Override
 	public void onCreate(@Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setHasOptionsMenu(true);
-
-		viewModel = new ViewModelProvider(requireActivity(), viewModelFactory)
-				.get(ConversationViewModel.class);
 	}
 
 	private SwitchCompat switchDisappearingMessages;
