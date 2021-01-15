@@ -118,15 +118,13 @@ public class SetPasswordFragment extends SetupFragment {
 		IBinder token = passwordEntry.getWindowToken();
 		Object o = getContext().getSystemService(INPUT_METHOD_SERVICE);
 		((InputMethodManager) o).hideSoftInputFromWindow(token, 0);
-		viewModel.password = passwordEntry.getText().toString();
 
-		if (viewModel.needToShowDozeFragment()) {
-			viewModel.state.setValue(DOZE);
-		} else {
+		if (!viewModel.needToShowDozeFragment()) {
 			nextButton.setVisibility(INVISIBLE);
 			progressBar.setVisibility(VISIBLE);
-			viewModel.state.setValue(CREATEACCOUNT);
 		}
+
+		viewModel.setPassword(passwordEntry.getText().toString());
 	}
 
 }

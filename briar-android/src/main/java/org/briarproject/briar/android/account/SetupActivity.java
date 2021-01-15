@@ -78,7 +78,7 @@ public class SetupActivity extends BaseActivity
 	@TargetApi(23)
 	void showDozeFragment() {
 		if (viewModel.authorName == null) throw new IllegalStateException();
-		if (viewModel.password == null) throw new IllegalStateException();
+		if (viewModel.getPassword() == null) throw new IllegalStateException();
 		showNextFragment(DozeFragment.newInstance());
 	}
 

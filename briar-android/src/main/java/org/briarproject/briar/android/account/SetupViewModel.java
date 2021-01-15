@@ -24,7 +24,9 @@ public class SetupViewModel extends AndroidViewModel {
 			Logger.getLogger(SetupActivity.class.getName());
 
 	@Nullable
-	public String authorName, password;
+	public String authorName;
+	@Nullable
+	private String password;
 
 	public final MutableLiveData<State> state = new MutableLiveData<>(State.AUTHORNAME);
 
@@ -47,6 +49,21 @@ public class SetupViewModel extends AndroidViewModel {
 		if (accountManager.accountExists()) throw new AssertionError();
 	}
 
+	@Nullable
+	String getPassword() {
+		return password;
+	}
+
+	void setPassword(String password) {
+		this.password = password;
+
+		if (needToShowDozeFragment()) {
+			state.setValue(State.DOZE);
+		} else {
+			state.setValue(State.CREATEACCOUNT);
+		}
+	}
+
 	float estimatePasswordStrength(String password) {
 	    return strengthEstimator.estimateStrength(password);
     }
@@ -60,9 +77,9 @@ public class SetupViewModel extends AndroidViewModel {
 	void createAccount() {
 		if (state.getValue() != State.CREATEACCOUNT) throw new IllegalStateException();
 		if (authorName == null) throw new IllegalStateException();
-		if (password == null) throw new IllegalStateException();
+		if (getPassword() == null) throw new IllegalStateException();
 		ioExecutor.execute(() -> {
-			if (accountManager.createAccount(authorName, password)) {
+			if (accountManager.createAccount(authorName, getPassword())) {
 				LOG.info("Created account");
 				this.state.postValue(State.CREATED);
 			} else {
