@@ -37,24 +37,23 @@ public class ConversationSettingsFragment extends BaseFragment {
 	@Inject
 	ViewModelProvider.Factory viewModelFactory;
 
-	private ConversationViewModel viewModel;
-	private SwitchCompat switchDisappearingMessages;
-
-	@Override
-	public String getUniqueTag() {
-		return TAG;
-	}
-
 	@Override
 	public void injectFragment(ActivityComponent component) {
 		component.inject(this);
 	}
 
+	private ConversationViewModel viewModel;
+
 	@Override
 	public void onCreate(@Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setHasOptionsMenu(true);
+
+		viewModel = new ViewModelProvider(requireActivity(), viewModelFactory)
+				.get(ConversationViewModel.class);
 	}
+
+	private SwitchCompat switchDisappearingMessages;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater,
@@ -74,9 +73,6 @@ public class ConversationSettingsFragment extends BaseFragment {
 		TextView buttonLearnMore =
 				contentView.findViewById(R.id.buttonLearnMore);
 		buttonLearnMore.setOnClickListener(e -> showLearnMoreDialog());
-
-		viewModel = new ViewModelProvider(requireActivity(), viewModelFactory)
-				.get(ConversationViewModel.class);
 
 		viewModel.getAutoDeleteTimer()
 				.observe(getViewLifecycleOwner(), timer -> {
@@ -110,6 +106,11 @@ public class ConversationSettingsFragment extends BaseFragment {
 				dialog = new ConversationSettingsLearnMoreDialog();
 		dialog.show(requireActivity().getSupportFragmentManager(),
 				ConversationSettingsLearnMoreDialog.TAG);
+	}
+
+	@Override
+	public String getUniqueTag() {
+		return TAG;
 	}
 
 }
