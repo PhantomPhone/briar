@@ -43,10 +43,8 @@ public class SetupViewModel extends AndroidViewModel {
 		this.accountManager = accountManager;
 		this.ioExecutor = ioExecutor;
 		this.strengthEstimator = strengthEstimator;
-	}
 
-	boolean accountExists() {
-		return accountManager.accountExists();
+		if (accountManager.accountExists()) throw new AssertionError();
 	}
 
 	float estimatePasswordStrength(String password) {

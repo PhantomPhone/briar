@@ -57,7 +57,6 @@ public class SetupActivity extends BaseActivity
 
 	private void onStateChanged(SetupViewModel.State state) {
 		if (state == AUTHORNAME) {
-			if (viewModel.accountExists()) throw new AssertionError();
 			showInitialFragment(AuthorNameFragment.newInstance());
 		} else if (state == SETPASSWORD) {
 			showPasswordFragment();
