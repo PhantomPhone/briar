@@ -22,24 +22,15 @@
 			app:tint="?attr/colorControlNormal"
 			tools:ignore="ContentDescription" />
 
-		<TextView
-			android:id="@+id/headlineSetting"
-			android:layout_width="0dp"
-			android:layout_height="wrap_content"
-			android:layout_marginTop="16dp"
-			android:text="@string/disappearing_messages_title"
-			android:textStyle="bold"
-			app:layout_constraintStart_toStartOf="parent"
-			app:layout_constraintTop_toBottomOf="@+id/imageViewBomb" />
-
 		<androidx.appcompat.widget.SwitchCompat
 			android:id="@+id/switchDisappearingMessages"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
+			android:layout_marginTop="16dp"
 			android:text="@string/disappearing_messages_summary"
 			app:layout_constraintEnd_toEndOf="parent"
 			app:layout_constraintStart_toStartOf="parent"
-			app:layout_constraintTop_toBottomOf="@+id/headlineSetting" />
+			app:layout_constraintTop_toBottomOf="@+id/imageViewBomb" />
 
 		<TextView
 			android:id="@+id/buttonLearnMore"
