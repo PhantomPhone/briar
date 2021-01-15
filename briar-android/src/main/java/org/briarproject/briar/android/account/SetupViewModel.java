@@ -27,7 +27,7 @@ class SetupViewModel extends AndroidViewModel {
 	@Nullable
 	private String authorName, password;
 
-	public final MutableLiveData<State> state = new MutableLiveData<>(State.AUTHORNAME);
+	final MutableLiveData<State> state = new MutableLiveData<>(State.AUTHORNAME);
 
 	private final Application app;
 	private final AccountManager accountManager;
