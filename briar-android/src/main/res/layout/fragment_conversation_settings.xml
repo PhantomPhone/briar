@@ -23,6 +23,25 @@
 			tools:ignore="ContentDescription" />
 
 		<TextView
+			android:id="@+id/headlineSetting"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_marginTop="16dp"
+			android:text="@string/disappearing_messages_title"
+			android:textStyle="bold"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toBottomOf="@+id/imageViewBomb" />
+
+		<androidx.appcompat.widget.SwitchCompat
+			android:id="@+id/switchDisappearingMessages"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/disappearing_messages_summary"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toBottomOf="@+id/headlineSetting" />
+
+		<TextView
 			android:id="@+id/buttonLearnMore"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
@@ -32,57 +51,7 @@
 			android:text="@string/learn_more"
 			android:textColor="?android:attr/textColorLink"
 			app:layout_constraintStart_toStartOf="parent"
-			app:layout_constraintTop_toBottomOf="@+id/imageViewBomb" />
-
-		<View
-			android:id="@+id/divider"
-			style="@style/Divider.Horizontal"
-			android:layout_width="match_parent"
-			android:layout_height="1dp"
-			android:layout_marginVertical="16dp"
-			android:background="?android:attr/listDivider"
-			app:layout_constraintBottom_toTopOf="@+id/barrier1"
-			app:layout_constraintTop_toBottomOf="@+id/buttonLearnMore" />
-
-		<androidx.constraintlayout.widget.Barrier
-			android:id="@+id/barrier1"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			app:barrierDirection="top" />
-
-		<TextView
-			android:id="@+id/headlineSetting"
-			android:layout_width="0dp"
-			android:layout_height="wrap_content"
-			android:text="@string/disappearing_messages_title"
-			android:textStyle="bold"
-			app:layout_constraintStart_toStartOf="parent"
-			app:layout_constraintTop_toBottomOf="@+id/barrier1" />
-
-		<TextView
-			android:id="@+id/textSetting"
-			android:layout_width="0dp"
-			android:layout_height="wrap_content"
-			android:text="@string/disappearing_messages_summary"
-			app:layout_constraintBottom_toTopOf="@id/barrier2"
-			app:layout_constraintEnd_toStartOf="@id/switchDisappearingMessages"
-			app:layout_constraintStart_toStartOf="parent"
-			app:layout_constraintTop_toBottomOf="@+id/headlineSetting" />
-
-		<androidx.appcompat.widget.SwitchCompat
-			android:id="@+id/switchDisappearingMessages"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			app:layout_constraintBottom_toTopOf="@id/barrier2"
-			app:layout_constraintEnd_toEndOf="parent"
-			app:layout_constraintStart_toEndOf="@+id/textSetting"
-			app:layout_constraintTop_toBottomOf="@+id/barrier1" />
-
-		<androidx.constraintlayout.widget.Barrier
-			android:id="@+id/barrier2"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			app:barrierDirection="top" />
+			app:layout_constraintTop_toBottomOf="@+id/switchDisappearingMessages" />
 
 	</androidx.constraintlayout.widget.ConstraintLayout>
 
