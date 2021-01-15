@@ -58,15 +58,13 @@ public class ConversationSettingsFragment extends BaseFragment {
 	public View onCreateView(LayoutInflater inflater,
 			@Nullable ViewGroup container,
 			@Nullable Bundle savedInstanceState) {
-		View contentView =
-				inflater.inflate(R.layout.fragment_conversation_settings,
-						container, false);
+		View contentView = inflater.inflate(
+				R.layout.fragment_conversation_settings, container, false);
 
-		switchDisappearingMessages =
-				contentView.findViewById(R.id.switchDisappearingMessages);
-		switchDisappearingMessages
-				.setOnCheckedChangeListener((button, value) -> viewModel
-						.setAutoDeleteTimerEnabled(value));
+		switchDisappearingMessages = contentView.findViewById(
+				R.id.switchDisappearingMessages);
+		switchDisappearingMessages.setOnCheckedChangeListener(
+				(button, value) -> viewModel.setAutoDeleteTimerEnabled(value));
 
 		TextView buttonLearnMore =
 				contentView.findViewById(R.id.buttonLearnMore);
