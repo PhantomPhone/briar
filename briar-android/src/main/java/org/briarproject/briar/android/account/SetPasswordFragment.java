@@ -70,7 +70,7 @@ public class SetPasswordFragment extends SetupFragment {
 		passwordConfirmation.addTextChangedListener(this);
 		nextButton.setOnClickListener(this);
 
-		if (viewModel != null && !viewModel.needToShowDozeFragment()) {
+		if (!viewModel.needToShowDozeFragment()) {
 			nextButton.setText(R.string.create_account_button);
 			passwordConfirmation.setImeOptions(IME_ACTION_DONE);
 		}

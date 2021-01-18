@@ -15,6 +15,7 @@ import android.widget.TextView.OnEditorActionListener;
 import org.briarproject.bramble.api.nullsafety.MethodsNotNullByDefault;
 import org.briarproject.bramble.api.nullsafety.ParametersNotNullByDefault;
 import org.briarproject.briar.R;
+import org.briarproject.briar.android.activity.ActivityComponent;
 import org.briarproject.briar.android.fragment.BaseFragment;
 
 import javax.inject.Inject;
@@ -38,10 +39,14 @@ abstract class SetupFragment extends BaseFragment implements TextWatcher,
 	SetupViewModel viewModel;
 
 	@Override
+	public void onCreate(@Nullable Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		viewModel = new ViewModelProvider(requireActivity()).get(SetupViewModel.class);
+	}
+
+	@Override
 	public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-
-		viewModel = new ViewModelProvider(requireActivity()).get(SetupViewModel.class);
 	}
 
 	@Override
