@@ -1,5 +1,6 @@
 package org.briarproject.bramble;
 
+import org.briarproject.bramble.autodelete.AutoDeleteModule;
 import org.briarproject.bramble.client.ClientModule;
 import org.briarproject.bramble.connection.ConnectionModule;
 import org.briarproject.bramble.contact.ContactModule;
@@ -28,6 +29,7 @@ import org.briarproject.bramble.versioning.VersioningModule;
 import dagger.Module;
 
 @Module(includes = {
+		AutoDeleteModule.class,
 		ClientModule.class,
 		ClockModule.class,
 		ConnectionModule.class,
