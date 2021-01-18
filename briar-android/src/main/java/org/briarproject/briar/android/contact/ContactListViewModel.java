@@ -49,7 +49,7 @@ import static org.briarproject.bramble.util.LogUtils.logException;
 import static org.briarproject.bramble.util.LogUtils.now;
 
 @NotNullByDefault
-class ContactListViewModel extends DbViewModel implements EventListener {
+public class ContactListViewModel extends DbViewModel implements EventListener {
 
 	private static final Logger LOG =
 			getLogger(ContactListViewModel.class.getName());
@@ -89,7 +89,7 @@ class ContactListViewModel extends DbViewModel implements EventListener {
 		eventBus.removeListener(this);
 	}
 
-	void loadContacts() {
+	public void loadContacts() {
 		loadList(this::loadContacts, contactListItems::setValue);
 	}
 
@@ -136,7 +136,7 @@ class ContactListViewModel extends DbViewModel implements EventListener {
 		}
 	}
 
-	LiveData<LiveResult<List<ContactListItem>>> getContactListItems() {
+	public LiveData<LiveResult<List<ContactListItem>>> getContactListItems() {
 		return contactListItems;
 	}
 

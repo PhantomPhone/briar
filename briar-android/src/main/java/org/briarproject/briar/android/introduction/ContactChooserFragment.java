@@ -5,57 +5,49 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import org.briarproject.bramble.api.connection.ConnectionRegistry;
 import org.briarproject.bramble.api.contact.Contact;
 import org.briarproject.bramble.api.contact.ContactId;
-import org.briarproject.bramble.api.contact.ContactManager;
-import org.briarproject.bramble.api.db.DbException;
 import org.briarproject.bramble.api.nullsafety.MethodsNotNullByDefault;
 import org.briarproject.bramble.api.nullsafety.ParametersNotNullByDefault;
 import org.briarproject.briar.R;
 import org.briarproject.briar.android.activity.ActivityComponent;
 import org.briarproject.briar.android.contact.BaseContactListAdapter.OnContactClickListener;
+import org.briarproject.briar.android.contact.ContactListAdapter;
 import org.briarproject.briar.android.contact.ContactListItem;
-import org.briarproject.briar.android.contact.LegacyContactListAdapter;
+import org.briarproject.briar.android.contact.ContactListViewModel;
 import org.briarproject.briar.android.fragment.BaseFragment;
 import org.briarproject.briar.android.view.BriarRecyclerView;
-import org.briarproject.briar.api.client.MessageTracker.GroupCount;
-import org.briarproject.briar.api.conversation.ConversationManager;
 
-import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Logger;
 
 import javax.inject.Inject;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.UiThread;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import static java.util.logging.Level.WARNING;
-import static org.briarproject.bramble.util.LogUtils.logException;
+import static org.briarproject.bramble.api.nullsafety.NullSafety.requireNonNull;
 import static org.briarproject.briar.android.conversation.ConversationActivity.CONTACT_ID;
 
 @UiThread
 @MethodsNotNullByDefault
 @ParametersNotNullByDefault
-public class ContactChooserFragment extends BaseFragment {
+public class ContactChooserFragment extends BaseFragment
+		implements OnContactClickListener<ContactListItem> {
 
 	public static final String TAG = ContactChooserFragment.class.getName();
-	private static final Logger LOG = Logger.getLogger(TAG);
 
+	@Inject
+	ViewModelProvider.Factory viewModelFactory;
+
+	private ContactListViewModel viewModel;
+	private final ContactListAdapter adapter = new ContactListAdapter(this);
 	private BriarRecyclerView list;
-	private LegacyContactListAdapter adapter;
 	private ContactId contactId;
 
-	// Fields that are accessed from background threads must be volatile
-	volatile Contact c1;
-	@Inject
-	volatile ContactManager contactManager;
-	@Inject
-	volatile ConversationManager conversationManager;
-	@Inject
-	volatile ConnectionRegistry connectionRegistry;
+	private Contact c1;
 
 	public static ContactChooserFragment newInstance(ContactId id) {
 		Bundle args = new Bundle();
@@ -69,6 +61,8 @@ public class ContactChooserFragment extends BaseFragment {
 	@Override
 	public void injectFragment(ActivityComponent component) {
 		component.inject(this);
+		viewModel = new ViewModelProvider(this, viewModelFactory)
+				.get(ContactListViewModel.class);
 	}
 
 	@Override
@@ -78,15 +72,6 @@ public class ContactChooserFragment extends BaseFragment {
 
 		View contentView = inflater.inflate(R.layout.list, container, false);
 
-		OnContactClickListener<ContactListItem> onContactClickListener =
-				(view, item) -> {
-					if (c1 == null) throw new IllegalStateException();
-					Contact c2 = item.getContact();
-					showMessageScreen(c1, c2);
-				};
-		adapter = new LegacyContactListAdapter(requireActivity(),
-				onContactClickListener);
-
 		list = contentView.findViewById(R.id.list);
 		list.setLayoutManager(new LinearLayoutManager(getActivity()));
 		list.setAdapter(adapter);
@@ -94,55 +79,45 @@ public class ContactChooserFragment extends BaseFragment {
 
 		contactId = new ContactId(requireArguments().getInt(CONTACT_ID));
 
+		viewModel.getContactListItems()
+				.observe(getViewLifecycleOwner(), result -> {
+					result.onError(this::handleException).onSuccess(items -> {
+						removeContact(items);
+						adapter.submitList(items);
+						if (requireNonNull(items).size() == 0) list.showData();
+					});
+				});
+
 		return contentView;
+	}
+
+	private void removeContact(List<ContactListItem> items) {
+		Iterator<ContactListItem> iterator = items.iterator();
+		while (iterator.hasNext()) {
+			ContactListItem item = iterator.next();
+			if (item.getContact().getId().equals(contactId)) {
+				c1 = item.getContact();
+				iterator.remove();
+			}
+		}
 	}
 
 	@Override
 	public void onStart() {
 		super.onStart();
-		loadContacts();
+		viewModel.loadContacts();
+		list.startPeriodicUpdate();
 	}
 
 	@Override
 	public void onStop() {
 		super.onStop();
-		adapter.clear();
-		list.showProgressBar();
+		list.stopPeriodicUpdate();
 	}
 
 	@Override
 	public String getUniqueTag() {
 		return TAG;
-	}
-
-	private void loadContacts() {
-		listener.runOnDbThread(() -> {
-			try {
-				List<ContactListItem> contacts = new ArrayList<>();
-				for (Contact c : contactManager.getContacts()) {
-					if (c.getId().equals(contactId)) {
-						c1 = c;
-					} else {
-						ContactId id = c.getId();
-						GroupCount count =
-								conversationManager.getGroupCount(id);
-						boolean connected =
-								connectionRegistry.isConnected(c.getId());
-						contacts.add(new ContactListItem(c, connected, count));
-					}
-				}
-				displayContacts(contacts);
-			} catch (DbException e) {
-				logException(LOG, WARNING, e);
-			}
-		});
-	}
-
-	private void displayContacts(List<ContactListItem> contacts) {
-		runOnUiThreadUnlessDestroyed(() -> {
-			if (contacts.isEmpty()) list.showData();
-			else adapter.addAll(contacts);
-		});
 	}
 
 	private void showMessageScreen(Contact c1, Contact c2) {
@@ -152,4 +127,10 @@ public class ContactChooserFragment extends BaseFragment {
 		showNextFragment(messageFragment);
 	}
 
+	@Override
+	public void onItemClick(View view, ContactListItem item) {
+		if (c1 == null) throw new IllegalStateException();
+		Contact c2 = item.getContact();
+		showMessageScreen(c1, c2);
+	}
 }
