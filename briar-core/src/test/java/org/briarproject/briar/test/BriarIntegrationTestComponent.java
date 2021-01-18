@@ -12,11 +12,11 @@ import org.briarproject.bramble.api.identity.IdentityManager;
 import org.briarproject.bramble.api.lifecycle.LifecycleManager;
 import org.briarproject.bramble.api.properties.TransportPropertyManager;
 import org.briarproject.bramble.test.BrambleCoreIntegrationTestModule;
-import org.briarproject.briar.api.autodelete.AutoDeleteManager;
 import org.briarproject.briar.api.blog.BlogFactory;
 import org.briarproject.briar.api.blog.BlogManager;
 import org.briarproject.briar.api.blog.BlogSharingManager;
 import org.briarproject.briar.api.client.MessageTracker;
+import org.briarproject.briar.api.conversation.AutoDeleteManager;
 import org.briarproject.briar.api.conversation.ConversationManager;
 import org.briarproject.briar.api.forum.ForumManager;
 import org.briarproject.briar.api.forum.ForumSharingManager;
@@ -25,9 +25,9 @@ import org.briarproject.briar.api.messaging.MessagingManager;
 import org.briarproject.briar.api.messaging.PrivateMessageFactory;
 import org.briarproject.briar.api.privategroup.PrivateGroupManager;
 import org.briarproject.briar.api.privategroup.invitation.GroupInvitationManager;
-import org.briarproject.briar.autodelete.AutoDeleteModule;
 import org.briarproject.briar.blog.BlogModule;
 import org.briarproject.briar.client.BriarClientModule;
+import org.briarproject.briar.conversation.ConversationModule;
 import org.briarproject.briar.forum.ForumModule;
 import org.briarproject.briar.introduction.IntroductionModule;
 import org.briarproject.briar.messaging.MessagingModule;
@@ -41,11 +41,11 @@ import dagger.Component;
 
 @Singleton
 @Component(modules = {
-		AutoDeleteModule.class,
 		BrambleCoreIntegrationTestModule.class,
 		BrambleCoreModule.class,
 		BlogModule.class,
 		BriarClientModule.class,
+		ConversationModule.class,
 		ForumModule.class,
 		GroupInvitationModule.class,
 		IntroductionModule.class,
@@ -58,9 +58,9 @@ public interface BriarIntegrationTestComponent
 
 	void inject(BriarIntegrationTest<BriarIntegrationTestComponent> init);
 
-	void inject(AutoDeleteModule.EagerSingletons init);
-
 	void inject(BlogModule.EagerSingletons init);
+
+	void inject(ConversationModule.EagerSingletons init);
 
 	void inject(ForumModule.EagerSingletons init);
 
@@ -124,8 +124,8 @@ public interface BriarIntegrationTestComponent
 				BriarIntegrationTestComponent c) {
 			BrambleCoreIntegrationTestEagerSingletons.Helper
 					.injectEagerSingletons(c);
-			c.inject(new AutoDeleteModule.EagerSingletons());
 			c.inject(new BlogModule.EagerSingletons());
+			c.inject(new ConversationModule.EagerSingletons());
 			c.inject(new ForumModule.EagerSingletons());
 			c.inject(new GroupInvitationModule.EagerSingletons());
 			c.inject(new IntroductionModule.EagerSingletons());
