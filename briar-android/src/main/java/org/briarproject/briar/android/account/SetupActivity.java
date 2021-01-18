@@ -38,6 +38,11 @@ public class SetupActivity extends BaseActivity
 	SetupViewModel viewModel;
 
 	@Override
+	public void injectActivity(ActivityComponent component) {
+		component.inject(this);
+	}
+
+	@Override
 	public void onCreate(@Nullable Bundle state) {
 		super.onCreate(state);
 		// fade-in after splash screen instead of default animation
@@ -48,11 +53,6 @@ public class SetupActivity extends BaseActivity
 				.get(SetupViewModel.class);
 
 		viewModel.state.observe(this, this::onStateChanged);
-	}
-
-	@Override
-	public void injectActivity(ActivityComponent component) {
-		component.inject(this);
 	}
 
 	private void onStateChanged(SetupViewModel.State state) {
