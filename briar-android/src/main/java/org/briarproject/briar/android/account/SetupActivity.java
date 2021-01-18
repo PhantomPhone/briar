@@ -40,6 +40,10 @@ public class SetupActivity extends BaseActivity
 	@Override
 	public void injectActivity(ActivityComponent component) {
 		component.inject(this);
+
+		viewModel = new ViewModelProvider(this, viewModelFactory)
+				.get(SetupViewModel.class);
+		viewModel.state.observe(this, this::onStateChanged);
 	}
 
 	@Override
@@ -48,11 +52,6 @@ public class SetupActivity extends BaseActivity
 		// fade-in after splash screen instead of default animation
 		overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
 		setContentView(R.layout.activity_fragment_container);
-
-		viewModel = new ViewModelProvider(this, viewModelFactory)
-				.get(SetupViewModel.class);
-
-		viewModel.state.observe(this, this::onStateChanged);
 	}
 
 	private void onStateChanged(SetupViewModel.State state) {
