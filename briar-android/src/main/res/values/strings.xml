@@ -553,7 +553,7 @@
 
 	<!-- Conversation Settings -->
 	<string name="disappearing_messages_title">Disappearing messages</string>
-	<string name="disappearing_messages_explanation_long">Turning on this setting will make new messages in this conversation automatically disappear 7 days after being received.
+	<string name="disappearing_messages_explanation_long">Turning on this setting will make new messages in this conversation automatically disappear 7\u00A0days after being received.
 		This applies to messages you send to your contact as well as messages your contact sends to you.
 		Your contact can also change this setting for the both of you.
 		\n\nMessages that will disappear are marked with a bomb icon.
