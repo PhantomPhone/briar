@@ -45,11 +45,6 @@ abstract class SetupFragment extends BaseFragment implements TextWatcher,
 	}
 
 	@Override
-	public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
-		super.onViewCreated(view, savedInstanceState);
-	}
-
-	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		inflater.inflate(R.menu.help_action, menu);
 		super.onCreateOptionsMenu(menu, inflater);
